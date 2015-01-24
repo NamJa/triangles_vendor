@@ -71,10 +71,6 @@ ifneq ($(TARGET_BUILD_VARIANT),eng)
 ADDITIONAL_DEFAULT_PROPERTIES += ro.adb.secure=1
 endif
 
-# Copy over the changelog to the device
-PRODUCT_COPY_FILES += \
-    vendor/cm/CHANGELOG.mkdn:system/etc/CHANGELOG-CM.txt
-
 # Backup Tool
 ifneq ($(WITH_GMS),true)
 PRODUCT_COPY_FILES += \
@@ -142,7 +138,7 @@ PRODUCT_PACKAGES += \
     Launcher3 \
     Trebuchet \
     AudioFX \
-    CMWallpapers \
+    TTAWallpapers \
     CMFileManager \
     Eleven \
     LockClock \
@@ -150,6 +146,7 @@ PRODUCT_PACKAGES += \
     CMAccount \
     CMHome \
     CyanogenSetupWizard
+    LockClock 
 
 # CM Platform Library
 PRODUCT_PACKAGES += \
@@ -225,6 +222,7 @@ PRODUCT_VERSION_MAJOR = 12
 PRODUCT_VERSION_MINOR = 1
 PRODUCT_VERSION_MAINTENANCE = 0-RC0
 
+
 # Set CM_BUILDTYPE from the env RELEASE_TYPE, for jenkins compat
 
 ifndef CM_BUILDTYPE
@@ -291,11 +289,31 @@ else
     endif
 endif
 
+# TRIANGLES MOD_VERSION
+PRODUCT_NAME = TRIANGLES
+ANDROID_CODENAME = 5.1
+TRIANGLES_BUILDTYPE = BETA2
+TRIANGLES_DEFAULT_VERSION = BETA2
+TRIANGLES_MAJORVERSION = v3
+TRIANGLES_MINORVERSION = 0
+
+ifndef TRIANGLES_MODVERSION
+	TRIANGLES_MODVERSION := $(PRODUCT_NAME)-$(ANDROID_CODENAME)-$(TRIANGLES_BUILDTYPE)-$(TRIANGLES_MAJORVERSION).$(TRIANGLES_MINORVERSION)-$(CM_BUILD)-$(shell date -u +%Y%m%d)
+endif
+
+ifndef TRIANGLES_CENTER_MODVERSION
+	TRIANGLES_CENTER_MODVERSION := $(TRIANGLES_MAJORVERSION).$(TRIANGLES_MINORVERSION)-$(TRIANGLES_DEFAULT_VERSION)-$(shell date -u +%Y%m%d)
+endif
+
+
+
 PRODUCT_PROPERTY_OVERRIDES += \
   ro.cm.version=$(CM_VERSION) \
   ro.cm.releasetype=$(CM_BUILDTYPE) \
   ro.modversion=$(CM_VERSION) \
-  ro.cmlegal.url=https://cyngn.com/legal/privacy-policy
+  ro.cmlegal.url=https://cyngn.com/legal/privacy-policy \
+  ro.tta.modversion=$(TRIANGLES_MODVERSION) \
+  ro.tta.center.version=$(TRIANGLES_CENTER_MODVERSION) 
 
 -include vendor/cm-priv/keys/keys.mk
 
@@ -322,9 +340,6 @@ endif
 
 # by default, do not update the recovery with system updates
 PRODUCT_PROPERTY_OVERRIDES += persist.sys.recovery_update=false
-
-PRODUCT_PROPERTY_OVERRIDES += \
-  ro.cm.display.version=$(CM_DISPLAY_VERSION)
 
 -include $(WORKSPACE)/build_env/image-auto-bits.mk
 
